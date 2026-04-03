@@ -3,17 +3,16 @@ import axios from "axios";
 
 export const getProduct = createAsyncThunk(
   "product/getProduct",
-  async ({ keyword,page = 1,category}, {rejectWithValue}) => {
+  async ({ keyword, page = 1, category }, { rejectWithValue }) => {
     try {
-
       let link = `/api/v1/products?page=${page}`;
-      if(keyword) {
+      if (keyword) {
         link += `&keyword=${encodeURIComponent(keyword)}`;
       }
-      if(category) {
+      if (category) {
         link += `&category=${encodeURIComponent(category)}`;
       }
-      
+
       // const link = keyword
       //   ? `/api/v1/products?keyword=${encodeURIComponent(keyword)}&page=${page}&category=${encodeURIComponent(category)}`
       //   : `/api/v1/products?page=${page}&category=${encodeURIComponent(category)}`;
@@ -24,7 +23,7 @@ export const getProduct = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response?.data || "An error occurred");
     }
-  }
+  },
 );
 
 // Product Details
@@ -37,7 +36,29 @@ export const getProductDetails = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error");
     }
-  }
+  },
+);
+
+// Sumbit Review
+export const createReview = createAsyncThunk(
+  "product/createReview",
+  async ({ rating, comment, productId }, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application.json",
+        },
+      };
+      const { data } = await axios.put(
+        "/api/v1/review",
+        { review, comment, productId },
+        config,
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Error");
+    }
+  },
 );
 
 const productSlice = createSlice({
@@ -49,11 +70,17 @@ const productSlice = createSlice({
     error: null,
     product: null,
     resultsPerPage: 4,
-    totalPages: 0
+    totalPages: 0,
+    reviewSuccess: false,
+    reviewLoading: false,
   },
   reducers: {
     removeErrors: (state) => {
       state.error = null;
+    },
+
+    removeSuccess: (state) => {
+      state.reviewSuccess = false;
     },
   },
   extraReducers: (builder) => {
@@ -70,14 +97,14 @@ const productSlice = createSlice({
         state.productCount = action.payload.productCount;
         state.resultsPerPage = action.payload.resultsPerPage;
         state.totalPages = action.payload.totalPages;
-
       })
       .addCase(getProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Something went wrong";
       });
 
-    builder.addCase(getProductDetails.pending, (state) => {
+    builder
+      .addCase(getProductDetails.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -93,8 +120,24 @@ const productSlice = createSlice({
         state.loading = false;
         state.error = action.payload || "Something went wrong";
       });
+
+    builder
+      .addCase(createReview.pending, (state) => {
+        state.reviewLoading = true;
+        state.error = null;
+      })
+
+      .addCase(createReview.fulfilled, (state, action) => {
+        state.reviewLoading = false;
+        state.reviewSuccess = true;
+      })
+
+      .addCase(createReview.rejected, (state, action) => {
+        state.reviewLoading = false;
+        state.error = action.payload || "Something went wrong";
+      });
   },
 });
 
-export const { removeErrors } = productSlice.actions;
+export const { removeErrors, removeSuccess } = productSlice.actions;
 export default productSlice.reducer;

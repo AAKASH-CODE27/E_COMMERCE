@@ -18,8 +18,8 @@ import { addItemsToCart, removeMessage } from "../features/cart/cartSlice";
 
 // USED FOR SHOWING THE DETAIL OF THE PRODUCT
 function ProductDetails() {
-
   const [userRating, setUserRating] = useState(0);
+  const [comment, setComment] = useState("");
   const [quantity, setQuantity] = useState(1);
 
   const handleRatingChange = (newRating) => {
@@ -27,10 +27,15 @@ function ProductDetails() {
   };
 
   const { loading, error, product } = useSelector((state) => state.product);
-  const { loading: cartLoading, error: cartError, success, message, cartItems } =
-    useSelector((state) => state.cart);
+  const {
+    loading: cartLoading,
+    error: cartError,
+    success,
+    message,
+    cartItems,
+  } = useSelector((state) => state.cart);
 
-    console.log(cartItems);
+  // console.log(cartItems);
   const dispatch = useDispatch();
   const { id } = useParams();
 
@@ -66,7 +71,7 @@ function ProductDetails() {
       });
       dispatch(removeMessage());
     }
-  },[dispatch, success, message])
+  }, [dispatch, success, message]);
 
   if (loading) {
     return (
@@ -205,9 +210,9 @@ function ProductDetails() {
                 <h3>Submit Your Review</h3>
 
                 <Rating
-                  name="simple-controlled"
+                  // name="simple-controlled"
                   value={4}
-                  onChange={() => {}}
+                  onRatingChange={handleRatingChange}
                 />
 
                 <textarea
