@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import "../pageStyles/ProductDetails.css";
 import PageTitle from "../components/PageTitle";
 import Navbar from "../components/Navbar";
@@ -11,10 +11,12 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loader from "../components/Loader";
 import {
+  createReview,
   getProductDetails,
   removeErrors,
 } from "../features/products/productSlice";
 import { addItemsToCart, removeMessage } from "../features/cart/cartSlice";
+import { removeSuccess } from "../features/user/userSlice";
 
 // USED FOR SHOWING THE DETAIL OF THE PRODUCT
 function ProductDetails() {
@@ -26,7 +28,9 @@ function ProductDetails() {
     setUserRating(newRating);
   };
 
-  const { loading, error, product } = useSelector((state) => state.product);
+  const { loading, error, product, reviewSuccess, reviewLoading } = useSelector(
+    (state) => state.product,
+  );
   const {
     loading: cartLoading,
     error: cartError,
@@ -73,29 +77,6 @@ function ProductDetails() {
     }
   }, [dispatch, success, message]);
 
-  if (loading) {
-    return (
-      <>
-        <Navbar />
-        <Loader />
-        <Footer />
-      </>
-    );
-  }
-
-  if (error || !product) {
-    return (
-      <>
-        <PageTitle title="Product Not Found" />
-        <Navbar />
-        <div className="error-container">
-          <h2 className="error-message">Product Not Found</h2>
-        </div>
-        <Footer />
-      </>
-    );
-  }
-
   const decreaseQuantity = () => {
     if (quantity < 2) {
       toast.error(`Selected item quanity cannot be zero`, {
@@ -124,6 +105,64 @@ function ProductDetails() {
     dispatch(addItemsToCart({ id, quantity }));
   };
 
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    if (!userRating) {
+      toast.error("Please Select a rating", {
+        postion: "top-center",
+        autoClose: 3000,
+      });
+      return;
+    }
+    dispatch(
+      createReview({
+        rating: userRating,
+        comment,
+        productId: id,
+      }),
+    );
+  };
+  
+  useEffect(() => {
+    if (reviewSuccess) {
+      toast.success("Review Submitted Successfully", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      setUserRating(0);
+      setComment("");
+
+      setTimeout(() => {
+        dispatch(getProductDetails(id));
+      }, 200);
+
+      dispatch(removeSuccess());
+      dispatch(getProductDetails(id));
+    }
+  }, [reviewSuccess, id, dispatch]);
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <Loader />
+        <Footer />
+      </>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <>
+        <PageTitle title="Product Not Found" />
+        <Navbar />
+        <div className="error-container">
+          <h2 className="error-message">Product Not Found</h2>
+        </div>
+        <Footer />
+      </>
+    );
+  }
   return (
     <div>
       <>
@@ -206,22 +245,29 @@ function ProductDetails() {
                 </>
               )}
 
-              <form className="review-form">
+              <form className="review-form" onSubmit={handleReviewSubmit}>
                 <h3>Submit Your Review</h3>
 
                 <Rating
-                  // name="simple-controlled"
-                  value={4}
-                  onRatingChange={handleRatingChange}
+                  value={userRating}
+                  disabled={false}
+                  onChange={(e, newValue) => setUserRating(newValue)}
                 />
 
                 <textarea
                   placeholder="Write your review here..."
                   className="review-input"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  required
                 ></textarea>
 
-                <button type="submit" className="submit-review-btn">
-                  Submit Review
+                <button
+                  type="submit"
+                  className="submit-review-btn"
+                  disabled={reviewLoading}
+                >
+                  {reviewLoading ? "Submitting..." : "Submit Review"}
                 </button>
               </form>
             </div>

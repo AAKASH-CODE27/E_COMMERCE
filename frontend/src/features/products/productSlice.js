@@ -46,12 +46,12 @@ export const createReview = createAsyncThunk(
     try {
       const config = {
         headers: {
-          "Content-Type": "application.json",
+          "Content-Type": "application/json",
         },
       };
       const { data } = await axios.put(
         "/api/v1/review",
-        { review, comment, productId },
+        { rating, comment, productId },
         config,
       );
       return data;
@@ -84,6 +84,7 @@ const productSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    // Get Product
     builder
       .addCase(getProduct.pending, (state) => {
         state.loading = true;
@@ -103,6 +104,7 @@ const productSlice = createSlice({
         state.error = action.payload || "Something went wrong";
       });
 
+// Product Details
     builder
       .addCase(getProductDetails.pending, (state) => {
         state.loading = true;
@@ -120,7 +122,7 @@ const productSlice = createSlice({
         state.loading = false;
         state.error = action.payload || "Something went wrong";
       });
-
+// Review 
     builder
       .addCase(createReview.pending, (state) => {
         state.reviewLoading = true;

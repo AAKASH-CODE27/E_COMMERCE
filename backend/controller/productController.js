@@ -142,10 +142,12 @@ export const productReview = handleAsyncError(async (req, res, next) => {
     (review) =>
       review.user && review.user.toString() === req.user._id.toString(),
   );
+
   if (reviewsExists) {
     product.reviews.forEach((review) => {
       if (review.user && review.user.toString() === req.user._id.toString()) {
-        ((review.rating = Number(rating)), (review.comment = comment));
+        review.rating = Number(rating);
+        review.comment = comment;
       }
     });
   } else {
