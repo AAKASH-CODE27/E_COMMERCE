@@ -12,6 +12,7 @@ import {
   ShoppingCart,
   Star,
   Error as ErrorIcon,
+  Instagram,
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
@@ -96,6 +97,23 @@ function Dashboard() {
               <h3>Total Orders</h3>
               <p>5</p>
             </div>
+          </div>
+
+          <div className="social-stats">
+            <div className="social-box instagram">
+              <Instagram />
+              <h3> Instagram</h3>
+              <p> 123K Followers</p>
+              <p> 12 Post</p>
+            </div>
+
+            <div className="social-box linkedIn">
+              <Instagram />
+              <h3> LinkedIn</h3>
+              <p> 2000 Followers</p>
+              <p> 5 Post</p>
+            </div>
+
           </div>
         </div>
       </div>

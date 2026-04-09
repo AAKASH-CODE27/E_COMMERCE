@@ -32,7 +32,7 @@ class APIFunctionality {
     const currentPage = Number(this.queryStr.page || 1);
     console.log(typeof currentPage);
     // no of skipped product to display on currentPage
-    // i.e., pg1 10 , pg2 11-20, pg3 21-30
+    // i.e., pg1-10 , pg2 11-20, pg3 21-30
     const skip = (currentPage - 1) * resultPerPage;
     this.query = this.query.limit(resultPerPage).skip(skip);
     return this;

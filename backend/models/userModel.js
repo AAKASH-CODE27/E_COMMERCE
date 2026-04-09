@@ -80,8 +80,8 @@ userSchema.methods.generatePasswordResetToken = function () {
     .digest("hex");
   // console.log(resetPasswordToken);
 
-  console.log("Raw reset token:", resetToken);
-console.log("Hashed token stored:", this.resetPasswordToken);
+//   console.log("Raw reset token:", resetToken);
+// console.log("Hashed token stored:", this.resetPasswordToken);
   this.resetPasswordExpire = Date.now() + 120 * 60 * 1000; // 30 min * sec*ms
   return resetToken;
 };
