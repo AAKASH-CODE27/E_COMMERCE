@@ -3,22 +3,22 @@ import dotenv from "dotenv";
 import { connectMongoDataBase } from "./config/db.js";
 
 dotenv.config({ path: "./backend/config/config.env" });
-import {v2 as cloudinary} from "cloudinary";  
+import { v2 as cloudinary } from "cloudinary";
 connectMongoDataBase();
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
-//  secure: true,
-})
+  //  secure: true,
+});
 
 // Handling expection error
-// console.log(myName); 
-process.on('uncaughtException',(err) => {
+// console.log(myName);
+process.on("uncaughtException", (err) => {
   console.log(`Error: ${err.message}`);
   console.log(`Server is shutting down, due to uncaught exception`);
-  process.exit(1);  // NO NEED TO CLOSE THE SERVER JUST GET OUT OF THE PROCESS
-})
+  process.exit(1); // NO NEED TO CLOSE THE SERVER JUST GET OUT OF THE PROCESS
+});
 // console.log(app);
 const port = process.env.PORT || 3000;
 
@@ -33,13 +33,12 @@ const server = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
-
 // PROMISE ERROR
 
-process.on('unhandledRejection',(err) => {
+process.on("unhandledRejection", (err) => {
   console.log(`Error: ${err.message}`);
   console.log(`Server is shutting down, due to unhandled promise rejection`);
-  server.close(() =>{
-      process.exit(1)
-  })
-})
+  server.close(() => {
+    process.exit(1);
+  });
+});

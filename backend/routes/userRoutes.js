@@ -14,6 +14,7 @@ import {
   updateUserRole,
 } from "../controller/userController.js";
 import { roleBasedAccess, verifyUserAuth } from "../middleware/userAuth.js";
+
 const router = express.Router();
 
 router.route("/register").post(registerUser);

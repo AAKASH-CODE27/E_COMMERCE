@@ -1,33 +1,31 @@
 import Product from "../models/productModel.js";
 import APIFunctionality from "../utils/apiFunctionality.js";
 import HandleError from "../utils/handleError.js";
+import { v2 as cloudinary } from "cloudinary";
 import handleAsyncError from "../middleware/handleAsyncError.js";
-import {v2 as cloudinary } from 'cloudinary'
-
 //CREATING PRODUCT
 export const createProduct = handleAsyncError(async (req, res, next) => {
   let image = [];
 
-  if(typeof req,body.image === "string"){
+  if ((typeof req, body.image === "string")) {
     image.push(req.body.image);
-  }
-  else{
+  } else {
     image = req.body.image;
   }
 
   const imageLinks = [];
 
-  for(let i = 0;i<image.length;i++){
-    const result = await cloudinary.uploader.upload(image[i],{
-      folder : 'products '
-    })
+  for (let i = 0; i < image.length; i++) {
+    const result = await cloudinary.uploader.upload(image[i], {
+      folder: "products ",
+    });
 
     imageLinks.push({
       public_id: result.public_id,
-      url: result.secure_url
-    })
+      url: result.secure_url,
+    });
   }
-  req.body.image = imageLinks
+  req.body.image = imageLinks;
   req.body.user = req.user.id;
   try {
     const product = await Product.create(req.body);
@@ -85,16 +83,45 @@ export const getAllProducts = handleAsyncError(async (req, res, next) => {
 
 // UPDATE PRODUCT
 export const updateProduct = handleAsyncError(async (req, res, next) => {
+  let product = await Product.findByIdAndUpdate(req.params.id);
+
+  if (!product) {
+    return next(new HandleError("Product Not Found", 404));
+  }
+
+  let images = [];
+  if (typeof req.body.image === "String") {
+    images.push(req.body.image);
+  } else if (Array.isArray(req.body.image)) {
+    images = req.body.image;
+  }
+
+  if (images.length > 0) {
+    for (let i = 0; i < product.image.length; i++) {
+      await cloudinary.uploader.destroy(product.image[i]);
+    }
+
+    const imageLinks = [];
+
+    for (let i = 0; i < images.length; i++) {
+      const result = await cloudinary.uploader.upload(images[i], {
+        folder: "products ",
+      });
+
+      imageLinks.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+      });
+    }
+    req.body.image = imageLinks;
+  }
+
   try {
     const id = req.params.id;
-    const product = await Product.findByIdAndUpdate(id, req.body, {
+    const product = await Product.findById(id, req.body, {
       new: true,
       runValidators: true,
     });
-
-    if (!product) {
-      return next(new HandleError("Product Not Found", 404));
-    }
 
     res.status(200).json({
       success: true,
@@ -148,7 +175,7 @@ export const getAdminProducts = handleAsyncError(async (req, res, next) => {
   });
 });
 
-//CREATE AND UPDATE REVIEW 7.40
+//CREATE AND UPDATE REVIEW
 export const productReview = handleAsyncError(async (req, res, next) => {
   const { rating, comment, productId } = req.body;
 
@@ -189,7 +216,7 @@ export const productReview = handleAsyncError(async (req, res, next) => {
   });
 });
 
-// PRODUCT REVIEW - 8.06
+// PRODUCT REVIEW
 export const getProductReviews = handleAsyncError(async (req, res, next) => {
   const id = req.query.id;
   const product = await Product.findById(id);
@@ -204,7 +231,7 @@ export const getProductReviews = handleAsyncError(async (req, res, next) => {
   });
 });
 
-//DELETING REVIEWS  8.10
+//DELETING REVIEWS
 export const deleteProductReviews = handleAsyncError(async (req, res, next) => {
   const { prodId, id } = req.query;
   console.log(req.params);

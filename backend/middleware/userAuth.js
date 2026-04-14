@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 import HandleError from "../utils/handleError.js";
 
-// 4.55.00
 export const verifyUserAuth = handleAsyncError(async (req, res, next) => {
   const { token } = req.cookies;
   //console.log(token);
@@ -18,8 +17,6 @@ export const verifyUserAuth = handleAsyncError(async (req, res, next) => {
   req.user = await User.findById(decodeData.id);
   next();
 });
-
-//5.18.00
 
 export const roleBasedAccess = (...roles) =>{
   return(req,res,next) => {

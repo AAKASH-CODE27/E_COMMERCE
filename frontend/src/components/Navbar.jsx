@@ -48,7 +48,7 @@ function Navbar() {
               <Link to="/"> Home</Link>
             </li>
             <li>
-              <Link to="/product">Product</Link>
+              <Link to="/products">Product</Link>
             </li>
             <li>
               <Link to="/about">About</Link>
@@ -97,11 +97,11 @@ function Navbar() {
               className="user-avatar-container"
               onClick={() => setOpenDashboard(!openDashboard)}
             >
-              <img
+              {/* <img
                 src={user?.avatar?.url || "/images/profile.png"}
                 alt="user"
                 className="navbar-avatar"
-              />
+              /> */}
 
               {openDashboard && <UserDashboard user={user} />}
             </div>

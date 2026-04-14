@@ -4,7 +4,7 @@ import User from "../models/userModel.js";
 import handleAsyncError from "../middleware/handleAsyncError.js";
 import HandleError from "../utils/handleError.js";
 
-// CREATE NEW ORDER 8.30
+// CREATE NEW ORDER 
 export const createNewOrder = handleAsyncError(async (req, res, next) => {
   const {
     shippingInfo,
@@ -34,7 +34,7 @@ export const createNewOrder = handleAsyncError(async (req, res, next) => {
   });
 });
 
-// GETTING SINGLE ORDER 8.47
+// GETTING SINGLE ORDER 
 export const getSingleOrder = handleAsyncError(async (req, res, next) => {
   const order = await Order.findById(req.params.id).populate(
     "user",
@@ -51,7 +51,7 @@ export const getSingleOrder = handleAsyncError(async (req, res, next) => {
   });
 });
 
-// GETTING ALL ORDER OF A USER 8.52
+// GETTING ALL ORDER OF A USER 
 export const getAllOrderByUser = handleAsyncError(async (req, res, next) => {
   const order = await Order.find({ user: req.user.id });
   if (!order) {
@@ -81,7 +81,7 @@ export const getAllOrder = handleAsyncError(async (req, res, next) => {
   });
 });
 
-//UPDATE ORDER STATUS // 9
+//UPDATE ORDER STATUS 
 export const updateOrder = handleAsyncError(async (req, res, next) => {
   const order = await Order.findById(req.params.id);
 
@@ -118,7 +118,7 @@ async function updateQuantity(id, quantity) {
   await product.save({ validateBeforeSave: false });
 }
 
-// DELETE A ORDER 9.20
+// DELETE A ORDER 
 export const deleteOrder = handleAsyncError(async (req, res, next) => {
   const order = await Order.findById(req.params.id);
   if (!order) {

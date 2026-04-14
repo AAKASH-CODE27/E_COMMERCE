@@ -82,7 +82,7 @@ export const loginUser = handleAsyncError(async (req, res, next) => {
   sendToken(user, 200, res);
 });
 
-// LOG OUT 5.09.00
+// LOG OUT
 
 export const logout = handleAsyncError(async (req, res, next) => {
   (res.cookie("token", null, {
@@ -96,7 +96,6 @@ export const logout = handleAsyncError(async (req, res, next) => {
 });
 
 // Reset Password
-// 5.50
 export const requestPasswordReset = handleAsyncError(async (req, res, next) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
@@ -183,7 +182,7 @@ export const resetPassword = handleAsyncError(async (req, res, next) => {
   sendToken(user, 200, res);
 });
 
-// GET USER DETAILS 6.39.00
+// GET USER DETAILS 
 
 export const getUserDetails = handleAsyncError(async (req, res, next) => {
   const user = await User.findById(req.user.id);
@@ -195,7 +194,7 @@ export const getUserDetails = handleAsyncError(async (req, res, next) => {
   });
 });
 
-//UPDATE PASSWORD 6.46
+//UPDATE PASSWORD
 
 export const updatePassword = handleAsyncError(async (req, res, next) => {
   const { oldPassword, newPassword, confirmPassword } = req.body;
@@ -215,7 +214,7 @@ export const updatePassword = handleAsyncError(async (req, res, next) => {
   sendToken(user, 200, res);
 });
 
-//Updating user profile 6.50
+//Updating user profile
 export const updateProfile = handleAsyncError(async (req, res, next) => {
   const { name, email } = req.body;
   const updateUserDetails = {
@@ -234,7 +233,7 @@ export const updateProfile = handleAsyncError(async (req, res, next) => {
   });
 });
 
-// ADMIN GETTING USER INFORMATION  7.14
+// ADMIN GETTING USER INFORMATION 
 export const getUsersList = handleAsyncError(async (req, res, next) => {
   const users = await User.find();
 
@@ -244,7 +243,7 @@ export const getUsersList = handleAsyncError(async (req, res, next) => {
   });
 });
 
-//ADMIN GETTING SINGLE USER 7.17
+//ADMIN GETTING SINGLE USER 
 export const getSingleUser = handleAsyncError(async (req, res, next) => {
   const id = req.params.id;
   const user = await User.findById(id);
@@ -258,7 +257,7 @@ export const getSingleUser = handleAsyncError(async (req, res, next) => {
   });
 });
 
-//ADMIN ONLY CHANGE USER ROLE 7.24
+//ADMIN ONLY CHANGE USER ROLE
 export const updateUserRole = handleAsyncError(async (req, res, next) => {
   const { role } = req.body;
   const newRole = { role };
