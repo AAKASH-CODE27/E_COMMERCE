@@ -20,11 +20,11 @@ app.use(
      tempFileDir: "./tmp/",
   })
 );
-app.use(cookieParser()); // 5.00.00
+app.use(cookieParser());
 // Route
 app.use("/api/v1", product);
 app.use("/api/v1", user);
-app.use("/api/v1", order); //8.39
+app.use("/api/v1", order); 
 
 
 // Error Middleware (must be last)
