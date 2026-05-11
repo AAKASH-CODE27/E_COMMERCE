@@ -4,9 +4,15 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useDispatch, useSelector } from "react-redux";
 import PageTitle from "../components/PageTitle";
-import { fetchAdminProducts, removeErrors } from "../features/admin/adminSlice";
+import {
+  fetchAdminProducts,
+  removeErrors,
+  deleteProduct,
+} from "../features/admin/adminSlice";
 import { Link } from "react-router-dom";
 import { Delete, Edit } from "@mui/icons-material";
+import { removeSuccess } from "../features/user/userSlice";
+import { toast } from "react-toastify";
 
 function ProductsList() {
   const { products, loading, error } = useSelector((state) => state.admin);
@@ -22,6 +28,25 @@ function ProductsList() {
       dispatch(removeErrors());
     }
   }, [dispatch, error]);
+
+  const handleDelete = (productId) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this product?",
+    );
+
+    if (isConfirmed) {
+      dispatch(deleteProduct(productId)).then((action) => {
+        if (action.type === "admin/deleteProduct/fulfilled") {
+          toast.success("Product deleted successfully", {
+            position: "top-center",
+            autoClose: 3000,
+          });
+        } else {
+          toast.error("Unable to Delete Product");
+        }
+      });
+    }
+  };
 
   if (!products || products.length === 0) {
     return (
@@ -72,27 +97,26 @@ function ProductsList() {
                     <td>{product.category}</td>
                     <td>{product.stock}</td>
 
-                    <td>{new Date(product.createAt).toLocaleString()}</td>
+                    <td>{new Date(product.createdAt).toLocaleString()}</td>
                     <td>
                       <Link
                         to={`/admin/products/${product._id}`}
                         className="action-icon edit-icon"
                       >
                         {" "}
-                        <Edit />
+                        <Edit />{" "}
                       </Link>
 
-                      <Link
-                        to={`/product/${product._id}`}
+                      <button
                         className="action-icon delete-icon"
+                        onClick={() => handleDelete(product._id)}
                       >
-                        {" "}
                         <Delete />
-                      </Link>
+                      </button>
                     </td>
                   </tr>
                 ))}
-                {products.map((product, index) => console.log(product))}
+                {/* {products.map((product, index) => console.log(product))} */}
               </tbody>
             </table>
           </div>

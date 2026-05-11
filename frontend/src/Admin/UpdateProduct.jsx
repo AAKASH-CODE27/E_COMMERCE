@@ -4,7 +4,7 @@ import PageTitle from "../components/PageTitle";
 import Footer from "../components/Footer";
 import "../AdminStyles/UpdateProduct.css";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   removeErrors,
   removeSuccess,
@@ -28,6 +28,8 @@ function UpdateProduct() {
   const { product } = useSelector((state) => state.product);
   const { success, error, loading } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
+
+  const navigate = useNavigate();
   const { updateId } = useParams();
 
   useEffect(() => {
@@ -87,6 +89,7 @@ function UpdateProduct() {
         autoClose: 3000,
       });
       dispatch(removeSuccess());
+      navigate('/admin/products')
     }
 
     if (error) {
@@ -204,7 +207,7 @@ function UpdateProduct() {
             ))}
           </div>
 
-          <button className="update-product-submit-btn"> Update</button>
+          <button className="update-product-submit-btn"> {loading? 'Updating...' : 'Update'}</button>
         </form>
       </div>
       <Footer />

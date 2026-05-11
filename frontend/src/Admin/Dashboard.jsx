@@ -42,7 +42,7 @@ function Dashboard() {
 
             <div className="nav-section">
               <h3>Users</h3>
-              <Link to="/admin/products">
+              <Link to="/admin/users">
                 <People className="nav-icon" />
                 All Users
               </Link>
