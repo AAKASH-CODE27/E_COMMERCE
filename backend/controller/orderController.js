@@ -1,6 +1,7 @@
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import User from "../models/userModel.js";
+import Reservation from "../models/reservationModel.js";
 import handleAsyncError from "../middleware/handleAsyncError.js";
 import HandleError from "../utils/handleError.js";
 
@@ -16,6 +17,7 @@ export const createNewOrder = handleAsyncError(async (req, res, next) => {
     totalPrice,
   } = req.body;
 
+  // Create the Order
   const order = await Order.create({
     shippingInfo,
     orderItems,
@@ -27,6 +29,25 @@ export const createNewOrder = handleAsyncError(async (req, res, next) => {
     paidAt: Date.now(),
     user: req.user.id,
   });
+
+  // Deduct stock permanently and mark reservations as completed
+  await Promise.all(
+    orderItems.map(async (item) => {
+      // Deduct stock
+      const product = await Product.findById(item.product);
+      if (product) {
+        product.stock = Math.max(0, product.stock - item.quantity);
+        await product.save({ validateBeforeSave: false });
+      }
+
+      // Mark the user's pending reservation as completed
+      await Reservation.findOneAndUpdate(
+        { user: req.user.id, productId: item.product, status: "pending" },
+        { status: "completed" },
+        { new: true }
+      );
+    })
+  );
 
   res.status(200).json({
     success: true,
@@ -91,10 +112,19 @@ export const updateOrder = handleAsyncError(async (req, res, next) => {
   if (order.orderStatus === "Delivered") {
     return next(new HandleError("Order Already Delivered", 404));
   }
-  //   console.log(order.orderItems)
-  await Promise.all(
-    order.orderItems.map((item) => updateQuantity(item.product, item.quantity)),
-  );
+
+  // If order is updated to Cancelled, return stock back to inventory
+  if (req.body.status === "Cancelled" && order.orderStatus !== "Cancelled") {
+    await Promise.all(
+      order.orderItems.map(async (item) => {
+        const product = await Product.findById(item.product);
+        if (product) {
+          product.stock += item.quantity;
+          await product.save({ validateBeforeSave: false });
+        }
+      })
+    );
+  }
 
   order.orderStatus = req.body.status;
 
@@ -107,16 +137,6 @@ export const updateOrder = handleAsyncError(async (req, res, next) => {
     order,
   });
 });
-
-async function updateQuantity(id, quantity) {
-  const product = await Product.findById(id);
-
-  if (!product) {
-    return next(new HandleError("Product not found", 404));
-  }
-  product.stock -= quantity;
-  await product.save({ validateBeforeSave: false });
-}
 
 // DELETE A ORDER 
 export const deleteOrder = handleAsyncError(async (req, res, next) => {

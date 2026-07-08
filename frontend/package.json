@@ -16,6 +16,8 @@
     "@mui/material": "^7.3.8",
     "@mui/styled-engine": "^7.3.8",
     "@reduxjs/toolkit": "^2.11.2",
+    "@stripe/react-stripe-js": "^6.7.0",
+    "@stripe/stripe-js": "^9.9.0",
     "axios": "^1.13.5",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

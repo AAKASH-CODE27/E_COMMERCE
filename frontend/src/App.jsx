@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Home from "./pages/Home";
 import ProductDetails from "./pages/ProductDetails";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -21,13 +21,40 @@ import CreateProducts from "./Admin/CreateProducts";
 import UpdateProduct from "./Admin/UpdateProduct";
 import UsersList from "./Admin/UsersList";
 
+import Shipping from "./Cart/Shipping";
+import ConfirmOrder from "./Cart/ConfirmOrder";
+import Payment from "./Cart/Payment";
+import OrderSuccess from "./Cart/OrderSuccess";
+import MyOrders from "./Cart/MyOrders";
+import OrderDetails from "./Cart/OrderDetails";
+
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import axios from "axios";
+
 function App() {
   const { isAuthenticated, user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const [stripeApiKey, setStripeApiKey] = useState("");
+
+  async function getStripeApiKey() {
+    try {
+      const { data } = await axios.get("/api/v1/stripeapikey");
+      setStripeApiKey(data.stripeApiKey);
+    } catch (error) {
+      console.error("Error loading Stripe API key:", error);
+    }
+  }
 
   useEffect(() => {
     dispatch(loadUser());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      getStripeApiKey();
+    }
+  }, [isAuthenticated]);
 
   return (
     <Router>
@@ -52,7 +79,45 @@ function App() {
         />
         <Route path="/password/forgot" element={<ForgotPassword />} />
         <Route path="/reset/:token" element={<ResetPassword />} />
-        <Route path="cart" element={<Cart />} />
+        <Route path="/cart" element={<Cart />} />
+        
+        {/* Checkout & Order Routes */}
+        <Route
+          path="/shipping"
+          element={<ProtectedRoute element={<Shipping />} />}
+        />
+        <Route
+          path="/order/confirm"
+          element={<ProtectedRoute element={<ConfirmOrder />} />}
+        />
+        {stripeApiKey && (
+          <Route
+            path="/process/payment"
+            element={
+              <ProtectedRoute
+                element={
+                  <Elements stripe={loadStripe(stripeApiKey)}>
+                    <Payment />
+                  </Elements>
+                }
+              />
+            }
+          />
+        )}
+        <Route
+          path="/success"
+          element={<ProtectedRoute element={<OrderSuccess />} />}
+        />
+        <Route
+          path="/orders"
+          element={<ProtectedRoute element={<MyOrders />} />}
+        />
+        <Route
+          path="/order/:id"
+          element={<ProtectedRoute element={<OrderDetails />} />}
+        />
+
+        {/* Admin Routes */}
         <Route
           path="/admin/dashboard"
           element={<ProtectedRoute element={<Dashboard />} adminOnly={true} />}

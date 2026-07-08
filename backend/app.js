@@ -1,7 +1,9 @@
 import express from "express";
 import product from "./routes/productRoutes.js";
 import user from "./routes/userRoutes.js";
-import order from './routes/orderRoutes.js'
+import order from './routes/orderRoutes.js';
+import payment from "./routes/paymentRoutes.js";
+import reservation from "./routes/reservationRoutes.js";
 import errorHandleMiddleware from "./middleware/error.js";
 import cookieParser from "cookie-parser"; // 5.00.00
 import fileUpload from "express-fileupload";
@@ -25,6 +27,8 @@ app.use(cookieParser());
 app.use("/api/v1", product);
 app.use("/api/v1", user);
 app.use("/api/v1", order); 
+app.use("/api/v1", payment);
+app.use("/api/v1", reservation); 
 
 
 // Error Middleware (must be last)
